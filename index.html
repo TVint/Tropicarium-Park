@@ -8,7 +8,6 @@
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
 
     <style>
-      /* Layout per il pulsante Call to Action */
       #cta-container {
         position: absolute;
         top: 50%;
@@ -20,7 +19,6 @@
         transition: opacity 1.5s ease-in-out;
       }
 
-      /* Effetto lampeggiante morbido e soffuso */
       @keyframes pulse-soft {
         0% { transform: scale(1); box-shadow: 0 0 10px rgba(255, 102, 0, 0.4); }
         50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(255, 102, 0, 0.8); }
@@ -41,20 +39,10 @@
         text-transform: uppercase;
         letter-spacing: 1px;
       }
-
-      /* Overlay per il caricamento iniziale */
-      #loader {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0, 0, 0, 0.8); /* Leggermente trasparente */
-        display: flex; justify-content: center; align-items: center;
-        color: white; z-index: 9999; font-family: sans-serif; font-size: 20px;
-      }
     </style>
   </head>
   
   <body>
-    <div id="loader">Attivazione Fotocamera...</div>
-
     <div id="cta-container">
       <button id="cta-button" onclick="window.location.href='https://www.tropicarium.it/ticket'">
         SCOPRI DI PIÙ
@@ -86,33 +74,23 @@
 
     <script>
       document.addEventListener("DOMContentLoaded", function() {
-        const sceneEl = document.querySelector('a-scene');
         const targetEntity = document.querySelector('#target-entity');
         const videoDisplay = document.querySelector('#ar-video-display');
         const arVideo = document.querySelector('#ar-video');
         const ctaContainer = document.querySelector('#cta-container');
-        const loader = document.querySelector('#loader');
         
         let ctaTimer;
 
-        // CORRETTO: Usa arReady invece di ready
-        sceneEl.addEventListener("arReady", () => { 
-            loader.style.display = "none"; 
-        });
-
-        // Quando il volantino viene riconosciuto
         targetEntity.addEventListener("targetFound", () => {
           videoDisplay.emit('startFade'); 
           arVideo.play();
           
-          // Dopo 5 secondi appare la CTA
           ctaTimer = setTimeout(() => {
             ctaContainer.style.opacity = "1";
             ctaContainer.style.pointerEvents = "auto";
           }, 5000); 
         });
 
-        // Quando il volantino non è più visibile
         targetEntity.addEventListener("targetLost", () => {
           videoDisplay.emit('stopFade'); 
           arVideo.pause();
