@@ -2,85 +2,117 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>AR Tropicarium - Farfalle</title>
+    <title>AR Tropicarium - Experience</title>
     
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
 
     <style>
-      /* Stile del pulsante Call to Action sovrapposto */
+      /* Layout per il pulsante Call to Action */
       #cta-container {
         position: absolute;
-        bottom: 10%;
+        top: 50%;
         left: 50%;
-        transform: translateX(-50%);
-        z-index: 1000; /* Lo tiene sopra la fotocamera */
-        opacity: 0; /* Nascosto di default */
-        pointer-events: none; /* Disabilitato finché non appare */
-        transition: opacity 1s ease-in-out; /* Effetto dissolvenza morbido */
+        transform: translate(-50%, -50%);
+        z-index: 1000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 1.5s ease-in-out;
+      }
+
+      /* Effetto lampeggiante morbido e soffuso */
+      @keyframes pulse-soft {
+        0% { transform: scale(1); box-shadow: 0 0 10px rgba(255, 102, 0, 0.4); }
+        50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(255, 102, 0, 0.8); }
+        100% { transform: scale(1); box-shadow: 0 0 10px rgba(255, 102, 0, 0.4); }
       }
 
       #cta-button {
-        background-color: #ff6600; /* Arancione per convertire */
+        background: linear-gradient(135deg, #ff8c00, #ff4500);
         color: white;
         border: none;
-        padding: 15px 30px;
-        font-size: 18px;
+        padding: 18px 40px;
+        font-size: 20px;
+        font-family: sans-serif;
         font-weight: bold;
-        border-radius: 30px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        border-radius: 50px;
         cursor: pointer;
+        animation: pulse-soft 2.5s infinite ease-in-out;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      /* Overlay per il caricamento iniziale */
+      #loader {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: #000; display: flex; justify-content: center; align-items: center;
+        color: white; z-index: 9999; font-family: sans-serif;
       }
     </style>
   </head>
   
   <body>
+    <div id="loader">Caricamento AR...</div>
+
     <div id="cta-container">
-      <button id="cta-button" onclick="window.location.href='https://tropicarium.ticka.it/'">
-        ACQUISTA BIGLIETTI
+      <button id="cta-button" onclick="window.location.href='https://www.tropicarium.it/ticket'">
+        SCOPRI DI PIÙ
       </button>
     </div>
 
     <a-scene mindar-image="imageTargetSrc: ./targets.mind;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
       
       <a-assets>
-        <video id="ar-video" src="./farfalle.mp4" preload="auto" autoplay="false" loop="false" muted playsinline></video>
+        <video id="ar-video" src="./farfalle.mp4" preload="auto" muted playsinline loop="false"></video>
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
       <a-entity mindar-image-target="targetIndex: 0" id="target-entity">
-        <a-video src="#ar-video" width="1" height="2.1" position="0 0 0"></a-video>
+        <a-video 
+          id="ar-video-display" 
+          src="#ar-video" 
+          width="1" 
+          height="2.1" 
+          position="0 0 0" 
+          opacity="0"
+          animation__fadein="property: opacity; from: 0; to: 1; dur: 1500; startEvents: startFade"
+          animation__fadeout="property: opacity; from: 1; to: 0; dur: 500; startEvents: stopFade"
+        ></a-video>
       </a-entity>
-      
     </a-scene>
 
     <script>
       document.addEventListener("DOMContentLoaded", function() {
+        const sceneEl = document.querySelector('a-scene');
         const targetEntity = document.querySelector('#target-entity');
+        const videoDisplay = document.querySelector('#ar-video-display');
         const arVideo = document.querySelector('#ar-video');
         const ctaContainer = document.querySelector('#cta-container');
+        const loader = document.querySelector('#loader');
         
         let ctaTimer;
 
-        // Quando il telefono inquadra il volantino
-        targetEntity.addEventListener("targetFound", event => {
-          console.log("Volantino trovato!");
+        // Nasconde il loader quando la scena è pronta
+        sceneEl.addEventListener("ready", () => { loader.style.display = "none"; });
+
+        // Quando il volantino viene riconosciuto
+        targetEntity.addEventListener("targetFound", () => {
+          videoDisplay.emit('startFade'); // Avvia la sfumatura graduale
           arVideo.play();
           
-          // Fai apparire il bottone dopo 4.5 secondi (adattalo alla durata del volo)
+          // Dopo 5 secondi (regolabile) appare la CTA lampeggiante
           ctaTimer = setTimeout(() => {
             ctaContainer.style.opacity = "1";
             ctaContainer.style.pointerEvents = "auto";
           }, 5000); 
         });
 
-        // Quando il telefono perde il volantino
-        targetEntity.addEventListener("targetLost", event => {
-          console.log("Volantino perso.");
+        // Quando il volantino non è più visibile
+        targetEntity.addEventListener("targetLost", () => {
+          videoDisplay.emit('stopFade'); // Scompare velocemente
           arVideo.pause();
           
-          // Nascondi di nuovo il bottone e resetta il timer
           clearTimeout(ctaTimer);
           ctaContainer.style.opacity = "0";
           ctaContainer.style.pointerEvents = "none";
