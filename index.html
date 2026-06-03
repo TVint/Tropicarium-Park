@@ -8,6 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
 
     <style>
+      /* Layout per il pulsante Call to Action centrale */
       #cta-container {
         position: absolute;
         top: 50%;
@@ -19,6 +20,7 @@
         transition: opacity 1.5s ease-in-out;
       }
 
+      /* Effetto lampeggiante morbido e soffuso della CTA */
       @keyframes pulse-soft {
         0% { transform: scale(1); box-shadow: 0 0 10px rgba(255, 102, 0, 0.4); }
         50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(255, 102, 0, 0.8); }
@@ -44,21 +46,21 @@
   
   <body>
     <div id="cta-container">
-      <button id="cta-button" onclick="window.location.href='https://tropicarium.ticka.it/'">
-        TICKETS
+      <button id="cta-button" onclick="window.location.href='https://www.tropicarium.it/ticket'">
+        SCOPRI DI PIÙ
       </button>
     </div>
 
-    <a-scene
+    <a-scene 
       mindar-image="imageTargetSrc: ./targets.mind; uiScanning: #no; filterMinCF:0.001; filterBeta: 0.01;" 
       color-space="sRGB" 
       renderer="colorManagement: true, physicallyCorrectLights" 
       vr-mode-ui="enabled: false" 
       device-orientation-permission-ui="enabled: false">
       
-    <a-assets>
-      <video id="ar-video" src="./farfalle.mp4" preload="auto" muted playsinline loop="false"></video>
-    </a-assets>
+      <a-assets>
+        <video id="ar-video" src="./farfalle.mp4" preload="auto" muted playsinline loop="false"></video>
+      </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
@@ -86,16 +88,19 @@
         
         let ctaTimer;
 
+        // Quando l'utente inquadra la pagina del volantino
         targetEntity.addEventListener("targetFound", () => {
-          videoDisplay.emit('startFade'); 
+          videoDisplay.emit('startFade'); // Il video appare sfumando gradualmente
           arVideo.play();
           
+          // Dopo 5 secondi appare la CTA lampeggiante al centro
           ctaTimer = setTimeout(() => {
             ctaContainer.style.opacity = "1";
             ctaContainer.style.pointerEvents = "auto";
           }, 5000); 
         });
 
+        // Se l'utente allontana il telefono dal volantino
         targetEntity.addEventListener("targetLost", () => {
           videoDisplay.emit('stopFade'); 
           arVideo.pause();
