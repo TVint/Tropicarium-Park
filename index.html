@@ -37,19 +37,56 @@
         margin-bottom: 20px;
       }
 
-      .loader-content h2 {
-        font-size: 24px;
-        color: #ffffff;
-        margin: 0 0 10px 0;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-      }
+      /* --- Gruppo Principale (Italiano) --- */
+.main-title-group {
+  margin-bottom: 25px; /* Separa l'italiano dalle altre lingue */
+}
 
-      .loader-content p {
-        font-size: 16px;
-        color: #e0e0e0;
-        margin: 0 0 30px 0;
-      }
+.lang-it-title {
+  font-size: 28px;
+  color: #ffffff; /* Bianco puro ed evidente */
+  font-weight: 800; /* Molto marcato */
+  margin: 0 0 6px 0;
+  text-transform: uppercase; /* Forza il MAIUSCOLO */
+  letter-spacing: 1px;
+}
+
+.lang-it-sub {
+  font-size: 16px;
+  color: #e0e0e0; /* Grigio chiarissimo, ottima leggibilità */
+  margin: 0;
+  font-weight: normal; /* Frase normale */
+}
+
+/* --- Gruppo Secondario (Inglese e Tedesco) --- */
+.secondary-translations {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* Spazio tra il blocco inglese e quello tedesco */
+  margin-bottom: 35px; /* Spazio prima dello spinner */
+  border-top: 1px solid rgba(255, 255, 255, 0.1); /* Sottile linea di divisione soffusa */
+  padding-top: 20px;
+}
+
+.lang-block {
+  opacity: 0.75; /* Rende l'intero blocco leggermente meno invasivo */
+}
+
+.lang-secondary-title {
+  font-size: 16px; /* Decisamente più piccolo dell'italiano */
+  color: #b0b8c0; /* Grigio chiaro/medio per diversificare */
+  font-weight: 700;
+  margin: 0 0 4px 0;
+  text-transform: uppercase; /* Forza il MAIUSCOLO */
+  letter-spacing: 0.5px;
+}
+
+.lang-secondary-sub {
+  font-size: 13px; /* Testo compatto */
+  color: #9098a0; /* Grigio più spento per non distrarre */
+  margin: 0;
+  font-weight: normal; /* Frase normale */
+}
 
       .custom-spinner {
         margin: 0 auto;
@@ -106,14 +143,27 @@
 
     <div id="custom-loader">
       <div class="loader-content">
-        <img src="logo.png" alt="Tropicarium Logo" class="loader-logo" onerror="this.style.display='none';">
-        
-        <h2>Preparati alla magia<br>Inquadra il volantino per vederlo prendere vita...</h2>
-        <h3>Get ready for the magic!<br>Keep the flyer in view to watch it come to life...</h3>
-        <h3>Mach dich bereit für die Magie!<br>Halte den Flyer weiterhin im Bild, um zu sehen, wie er zum Leben erwacht...</p>
-        
-        <div class="custom-spinner"></div>
-      </div>
+  <img src="logo.png" alt="Tropicarium Logo" class="loader-logo" onerror="this.style.display='none';">
+  
+  <div class="main-title-group">
+    <h2 class="lang-it-title">PREPARATI ALLA MAGIA</h2>
+    <p class="lang-it-sub">Inquadra il volantino per vederlo prendere vita...</p>
+  </div>
+  
+  <div class="secondary-translations">
+    <div class="lang-block">
+      <h3 class="lang-secondary-title">GET READY FOR THE MAGIC</h3>
+      <p class="lang-secondary-sub">Frame the leaflet to see it come to life...</p>
+    </div>
+    
+    <div class="lang-block">
+      <h3 class="lang-secondary-title">BEREITE DICH AUF DIE MAGIE VOR</h3>
+      <p class="lang-secondary-sub">Scannen Sie den Flyer, um ihn zum Leben zu erwecken...</p>
+    </div>
+  </div>
+  
+  <div class="custom-spinner"></div>
+</div>
     </div>
 
     <div id="cta-container">
