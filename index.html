@@ -8,7 +8,78 @@
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
 
     <style>
-      /* Layout per il pulsante Call to Action centrale */
+
+      h2{
+        font-size:14px;
+      }
+
+      h3{
+        font-size:12px;
+      }
+      
+      p{
+        font-size:8px;
+      }
+
+      #custom-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #a2c73b;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        font-family: sans-serif;
+        color: white;
+        text-align: center;
+        transition: opacity 0.5s ease-in-out;
+      }
+
+      .loader-content {
+        padding: 20px;
+      }
+
+      .loader-logo {
+        width: 120px;
+        height: auto;
+        margin-bottom: 20px;
+      }
+
+      .loader-content h2 {
+        font-size: 24px;
+        color: #ffffff;
+        margin: 0 0 10px 0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .loader-content p {
+        font-size: 16px;
+        color: #e0e0e0;
+        margin: 0 0 30px 0;
+      }
+
+      .custom-spinner {
+        margin: 0 auto;
+        width: 50px;
+        height: 50px;
+        border: 5px solid rgba(255, 255, 255, 0.1);
+        border-left-color: #fdcc17;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      /* CTA */
+      
       #cta-container {
         position: absolute;
         top: 50%;
@@ -20,7 +91,6 @@
         transition: opacity 1.5s ease-in-out;
       }
 
-      /* Effetto lampeggiante morbido e soffuso della CTA */
       @keyframes pulse-soft {
         0% { transform: scale(1); box-shadow: 0 0 10px rgba(255, 102, 0, 0.4); }
         50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(255, 102, 0, 0.8); }
@@ -45,6 +115,24 @@
   </head>
   
   <body>
+
+    <div id="custom-loader">
+      <div class="loader-content">
+        <img src="logo.png" alt="Tropicarium Logo" class="loader-logo" onerror="this.style.display='none';">
+        
+        <h2>Preparati alla magia</h2>
+        <p>Inquadra il volantino per vederlo prendere vita...</p>
+
+        <h3>Get ready for the magic!</h3>
+        <p>Keep the flyer in view to watch it come to life...</p>
+
+        <h3>Mach dich bereit für die Magie!</h3>
+        <p>Halte den Flyer weiterhin im Bild, um zu sehen, wie er zum Leben erwacht...</p>
+        
+        <div class="custom-spinner"></div>
+      </div>
+    </div>
+
     <div id="cta-container">
       <button id="cta-button" onclick="window.location.href='https://www.tropicarium.it/ticket'">
         SCOPRI DI PIÙ
@@ -52,7 +140,7 @@
     </div>
 
     <a-scene 
-      mindar-image="imageTargetSrc: ./targets.mind; uiScanning: #no; filterMinCF:0.001; filterBeta: 0.01;" 
+      mindar-image="imageTargetSrc: ./targets.mind; uiScanning: #no; uiLoading: #no; filterMinCF:0.001; filterBeta: 0.01;" 
       color-space="sRGB" 
       renderer="colorManagement: true, physicallyCorrectLights" 
       vr-mode-ui="enabled: false" 
@@ -81,26 +169,38 @@
 
     <script>
       document.addEventListener("DOMContentLoaded", function() {
+        const sceneEl = document.querySelector('a-scene');
         const targetEntity = document.querySelector('#target-entity');
         const videoDisplay = document.querySelector('#ar-video-display');
         const arVideo = document.querySelector('#ar-video');
         const ctaContainer = document.querySelector('#cta-container');
+        const customLoader = document.querySelector('#custom-loader');
         
         let ctaTimer;
 
-        // Quando l'utente inquadra la pagina del volantino
+        // Quando il motore AR è totalmente pronto e la fotocamera è attiva, nascondiamo il nostro loader
+        sceneEl.addEventListener("arReady", () => {
+          customLoader.style.opacity = "0";
+          setTimeout(() => {
+            customLoader.style.display = "none";
+          }, 500); // Aspetta la fine della sfumatura
+        });
+
+        // Gestione errore di caricamento fotocamera o permessi negati
+        sceneEl.addEventListener("arError", () => {
+          document.querySelector('.loader-content p').innerText = "Errore nell'attivazione della fotocamera. Controlla i permessi.";
+        });
+
         targetEntity.addEventListener("targetFound", () => {
-          videoDisplay.emit('startFade'); // Il video appare sfumando gradualmente
+          videoDisplay.emit('startFade'); 
           arVideo.play();
           
-          // Dopo 5 secondi appare la CTA lampeggiante al centro
           ctaTimer = setTimeout(() => {
             ctaContainer.style.opacity = "1";
             ctaContainer.style.pointerEvents = "auto";
           }, 5000); 
         });
 
-        // Se l'utente allontana il telefono dal volantino
         targetEntity.addEventListener("targetLost", () => {
           videoDisplay.emit('stopFade'); 
           arVideo.pause();
